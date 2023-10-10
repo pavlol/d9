@@ -16,8 +16,8 @@ provider "aws" {
 }
 
 #Resource to create s3 bucket
-resource "aws_s3_bucket" "demo-bucket"{
-  bucket = "pavlol-s3-test-b1"
+resource "aws_s3_bucket" "pavlols3testb1"{
+  bucket = "pavlols3testb1"
 
   tags = {
     Name = "S3Bucket"
