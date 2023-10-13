@@ -5,7 +5,6 @@ terraform {
       version = "~> 3.27"
     }
   }
-
   required_version = ">= 0.14.9"
 }
 
@@ -16,35 +15,30 @@ provider "aws" {
 }
 
 #Resource to create s3 bucket - works
-# resource "aws_s3_bucket" "pavlols3testb1"{
-#   bucket = "pavlols3testb1"
-
-#   tags = {
-#     Name = "S3Bucket"
-#   }
-# }
+resource "aws_s3_bucket" "pavlols3testb1"{
+  bucket = "pavlols3testb1"
+  tags = {
+    Name = "S3Bucket"
+  }
+}
 
 # Upload an object - LOCK Error
-# resource "aws_s3_bucket_object" "object" {
+resource "aws_s3_bucket_object" "object" {
+  bucket = aws_s3_bucket.pavlols3testb1.id
+  key    = "profile"
+  acl = "public-read"
+  #acl    = "private"  # or can be "public-read"
 
-#   bucket = aws_s3_bucket.pavlols3testb1.id
+  source = "${path.module}/terravars.png"
+  # source = "myfiles/yourfile.txt"
 
-#   key    = "profile"
-#   acl = "public-read"
-#   #acl    = "private"  # or can be "public-read"
-
-#   source = "${path.module}/terravars.png"
-#   # source = "myfiles/yourfile.txt"
-
-#   etag = filemd5("${path.module}/terravars.png")
-
-# }
+  etag = filemd5("${path.module}/terravars.png")
+}
 
 # create ec2
 
-resource "aws_instance" "myEC2" {
+resource "aws_instance" "myEC-2" {
   ami = "ami-09100e341bda441c0"
-  
   instance_type = "t2.micro"
   tags = {
     Name = "ec2pavlodeham91210"
@@ -55,8 +49,6 @@ resource "aws_instance" "myEC2" {
 resource "aws_vpc" "main" {
  cidr_block = "10.0.0.0/16"
  instance_tenancy = "default"
- 
- 
  tags = {
    Name = "LYakhov VPC"
  }
