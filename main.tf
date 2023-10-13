@@ -23,20 +23,19 @@ resource "aws_s3_bucket" "pavlols3testb1"{
 }
 
 # Upload an object - LOCK Error
-resource "aws_s3_bucket_object" "object" {
-  bucket = aws_s3_bucket.pavlols3testb1.id
-  key    = "profile"
-  acl = "public-read"
-  #acl    = "private"  # or can be "public-read"
+# resource "aws_s3_bucket_object" "object" {
+#   bucket = aws_s3_bucket.pavlols3testb1.id
+#   key    = "profile"
+#   acl = "public-read"
+#   #acl    = "private"  # or can be "public-read"
 
-  source = "${path.module}/terravars.png"
-  # source = "myfiles/yourfile.txt"
+#   source = "${path.module}/terravars.png"
+#   # source = "myfiles/yourfile.txt"
 
-  etag = filemd5("${path.module}/terravars.png")
-}
+#   etag = filemd5("${path.module}/terravars.png")
+# }
 
 # create ec2
-
 resource "aws_instance" "myEC-2" {
   ami = "ami-09100e341bda441c0"
   instance_type = "t2.micro"
@@ -49,6 +48,7 @@ resource "aws_instance" "myEC-2" {
 resource "aws_vpc" "main" {
  cidr_block = "10.0.0.0/16"
  instance_tenancy = "default"
+
  tags = {
    Name = "LYakhov VPC"
  }
@@ -86,3 +86,33 @@ resource "aws_subnet" "private_subnets" {
  }
 }
 
+resource "aws_internet_gateway" "gw" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "main gateway"
+  }
+}
+
+resource "aws_default_route_table" "rt" {
+  default_route_table_id = aws_vpc.main.default_route_table_id
+
+  #"10.0.1.0/24", "10.0.1.0/24", "10.0.3.0/24"
+  route {
+    cidr_block = "10.0.1.0/24"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+
+  route {
+    cidr_block = "10.0.2.0/24"
+    gateway_id = aws_internet_gateway.gw.id
+  }
+
+  route {
+      cidr_block = "10.0.3.0/24"
+      gateway_id = aws_internet_gateway.gw.id
+    }
+  tags = {
+    Name = "defaul route table"
+  }
+}
